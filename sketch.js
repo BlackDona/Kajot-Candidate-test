@@ -1,5 +1,5 @@
 document.addEventListener("keypress", myKeyPress);
-let scoreCounter;
+//let scoreCounter;
 
 function myKeyPress(e) {
   var keynum;
@@ -16,40 +16,52 @@ function myKeyPress(e) {
     return;
   }
   pressedLetter = pressedLetter[0].toUpperCase();
-  if (!letters[pressedLetter]) {
+  if (!gd.letters[pressedLetter]) {
     score -= 2;
-    scoreCounter.text = "score: " + score;
+    $("#score").html("Score: " + score);
+    if (score < 0) {
+      $("#score").html("Score: 0");
+    }
     return;
   }
 
-  if (letters[pressedLetter].length < 2) {
+  if (gd.letters[pressedLetter].length < 2) {
     score -= 2;
-    letters[pressedLetter] = [];
-    scoreCounter.text = "score: " + score;
+    gd.letters[pressedLetter] = [];
+    $("#score").html("Score: " + score);
+    if (score < 0) {
+      $("#score").html("Score: 0");
+    }
     return;
   }
 
-  letters[pressedLetter] = [];
-  scoreCounter.text = "score: " + score;
+  gd.letters[pressedLetter] = [];
   score++;
+  $("#score").html("Score: " + score);
 }
 
 let score = 0;
-let letters = {};
 let fallSpeed = 0.1;
-let newTime = 0;
+let timerFromLastLetter = 0;
 let isRunning = false;
 
 function setup() {
-  let canvas = createCanvas(600, 400);
+  let canvas = createCanvas(800, 500);
   canvas.parent("holder");
+  colorMode(HSB, 255);
   background(220);
-  scoreCounter = document.getElementById("counter");
-  console.log(scoreCounter);
+  textSize(64);
+  textAlign(CENTER, CENTER);
+  fill(0)
+  text("WELCOME", width / 2, height / 2 - 100);
+  textSize(20);
+  text("Press Start", width / 2, height / 2);
+  //scoreCounter = document.getElementById("counter");
 }
 
 function startStop() {
   isRunning = !isRunning;
+  $("#score").html("Score: " + score);
 }
 
 function draw() {
@@ -57,11 +69,11 @@ function draw() {
     if (score < 0) {
       score = 0;
     }
-    fallSpeed = map(score, 0, 50, 2, 4);
+    fallSpeed = map(score, 0, 50, 10, 35);
     background(220);
     let isDown = false;
-    for (let letter of Object.keys(letters)) {
-      for (let item of letters[letter]) {
+    for (let letter of Object.keys(gd.letters)) {
+      for (let item of gd.letters[letter]) {
         isDown = item.fall();
         if (isDown) {
           break;
@@ -73,10 +85,10 @@ function draw() {
       }
     }
 
-    newTime += deltaTime / 100;
-    if (newTime > map(score, 0, 50, 4.5, 1.5)) {
+    timerFromLastLetter += deltaTime / 1000;
+    if (timerFromLastLetter > map(score, 0, 50, 1, 0.2)) {
       generateLetter();
-      newTime = 0;
+      timerFromLastLetter = 0;
     }
     if (isDown) {
       background(220);
@@ -85,10 +97,10 @@ function draw() {
       fill(0)
       text("GAME OVER", width / 2, height / 2 - 100);
       textSize(20);
-      text("score: " + score, width / 2, height / 2);
-      letters = {};
+      text("Score: " + score, width / 2, height / 2);
+      gd.letters = {};
       isRunning = false;
-      newTime = 0;
+      timerFromLastLetter = 0;
       score = 0;
     }
     if (score >= 50) {
@@ -97,9 +109,9 @@ function draw() {
       textAlign(CENTER, CENTER);
       fill(0)
       text("YOU WIN!", width / 2, height / 2);
-      letters = {};
+      gd.letters = {};
       isRunning = false;
-      newTime = 0;
+      timerFromLastLetter = 0;
       score = 0;
     }
   }
@@ -107,11 +119,11 @@ function draw() {
 
 function generateLetter() {
   let letter = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 1).toUpperCase();
-  if (!letters[letter]) {
-    letters[letter] = [];
+  if (!gd.letters[letter]) {
+    gd.letters[letter] = [];
   }
-  let bgSize = random(20, 60);
-  letters[letter].push(new Letter(random(width - bgSize), -75, letter, bgSize, random(15, bgSize - 3)))
+  let bgSize = random(20, 80);
+  gd.letters[letter].push(new Letter(random(width - bgSize), -85, letter, bgSize, random(15, bgSize - 2)))
 }
 
 class Letter {
@@ -123,11 +135,11 @@ class Letter {
     this.fontSize = fontSize;
   }
   fall() {
-    this.y += fallSpeed * (deltaTime / 100);
+    this.y += fallSpeed * (deltaTime / 1000);
     return this.y + this.size > height;
   }
   show() {
-    fill(100);
+    fill(map(this.char.charCodeAt(0), "A".charCodeAt(0), "Z".charCodeAt(0), 0, 240), 200, 200);
     square(this.x, this.y, this.size);
 
     textSize(this.fontSize);
