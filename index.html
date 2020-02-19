@@ -3,14 +3,24 @@
   <head>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.10.2/p5.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.10.2/addons/p5.sound.min.js"></script>
-    <link rel="stylesheet" type="text/css" src="/style.css">
+    <script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+  <script src="./gameData.js"></script>
+    <link rel="stylesheet" type="text/css" href="./style.css">
     <meta charset="utf-8" />
 
   </head>
   <body>
-    <div class="holder" id="holder">
-      <span class="score" id="counter">score: 0</span>
-      <button onclick="startStop()">Start/Stop</button>
+    <div class="wrapper">
+      <div class="content">
+        <div class="holder" id="holder"></div>
+        <div class="items">
+          <span class="score" id="score">Score: 0</span>
+          <button onclick="startStop()">Start/Stop</button>
+        </div>
+      </div>
     </div>
     <script src="/sketch.js"></script>
   </body>
